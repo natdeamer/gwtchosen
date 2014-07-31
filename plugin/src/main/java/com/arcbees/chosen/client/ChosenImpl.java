@@ -25,6 +25,7 @@ import com.arcbees.chosen.client.SelectParser.GroupItem;
 import com.arcbees.chosen.client.SelectParser.OptionItem;
 import com.arcbees.chosen.client.SelectParser.SelectItem;
 import com.arcbees.chosen.client.event.ChosenChangeEvent;
+import com.arcbees.chosen.client.event.ChosenCreateEvent;
 import com.arcbees.chosen.client.event.ChosenEvent;
 import com.arcbees.chosen.client.event.HidingDropDownEvent;
 import com.arcbees.chosen.client.event.MaxSelectedEvent;
@@ -64,6 +65,8 @@ import static com.google.gwt.query.client.GQuery.document;
 import static com.google.gwt.safehtml.shared.SafeHtmlUtils.fromTrustedString;
 
 public class ChosenImpl {
+    private static final String NO_RESULTS_CREATE_ID = "noResultsCreate";
+
     public static interface ChozenTemplate extends SafeHtmlTemplates {
         public ChozenTemplate templates = GWT.create(ChozenTemplate.class);
 
@@ -91,8 +94,11 @@ public class ChosenImpl {
         @Template("<li id=\"{0}\" class=\"{1}\">{2}</li>")
         SafeHtml group(String id, String groupResultClass, String content);
 
-        @Template("<li class=\"{0}\">{1}\"<span></span>\"</li>")
-        SafeHtml noResults(String noResultsClass, String content);
+        @Template("<li class=\"{0}\">{1}: '{2}'</li>")
+        SafeHtml noResults(String noResultsClass, String content, String terms);
+        
+        @Template("<li id=\"" + NO_RESULTS_CREATE_ID + "\" class=\"{0}\">{1}: '{2}'</li>")
+        SafeHtml noResultsCreate(String createClass, String content, String terms);
 
         @Template("<li id=\"{0}\" class=\"{1}\" style=\"{2}\">{3}</li>")
         SafeHtml option(String id, String groupResultClass, SafeStyles style, String content);
@@ -817,14 +823,20 @@ public class ChosenImpl {
 
     private void noResultClear() {
         searchResults.find("." + css.noResults()).remove();
+        searchResults.find("#noResultsCreate").remove();
     }
 
     private void noResults(String terms) {
         GQuery noResults =
-                $(ChozenTemplate.templates.noResults(css.noResults(), resultsNoneFound).asString());
-        noResults.find("span").html(terms);
-
+            $(ChozenTemplate.templates.noResults(css.noResults(), resultsNoneFound, terms).asString());
         searchResults.append(noResults);
+        
+        if (options.isNoResultsCreate()) {
+            GQuery noResultsCreate =
+                $(ChozenTemplate.templates.noResultsCreate(css.activeResult(),
+                    options.getNoResultsCreateText(), terms).asString());
+            searchResults.append(noResultsCreate);
+        }
     }
 
     private void resultActivate(GQuery query) {
@@ -955,6 +967,11 @@ public class ChosenImpl {
         } else if (highTop < visibleTop) {
             searchResults.scrollTop(highTop);
         }
+    }
+    
+    private void resultCreate(Event e) {
+        fireEvent(new ChosenCreateEvent(searchField.val(), this));
+        resultsHide();
     }
 
     private void resultSelect(Event e) {
@@ -1299,7 +1316,11 @@ public class ChosenImpl {
                 $e.hasClass(css.activeResult()) ? $e : $e.parents("." + css.activeResult()).first();
         if (!target.isEmpty()) {
             resultHighlight = target;
-            resultSelect(e);
+            if (resultHighlight != null && NO_RESULTS_CREATE_ID.equals(resultHighlight.attr("id"))) {
+                resultCreate(e);
+            } else {
+                resultSelect(e);
+            }
         }
         return false;
     }
@@ -1335,7 +1356,6 @@ public class ChosenImpl {
         } else {
             resultsNoneFound = "No results match";
         }
-
     }
 
     private void setDefaultValues() {

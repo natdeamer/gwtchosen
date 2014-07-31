@@ -21,6 +21,8 @@ import com.arcbees.chosen.client.ChosenImpl;
 import com.arcbees.chosen.client.ChosenOptions;
 import com.arcbees.chosen.client.event.ChosenChangeEvent;
 import com.arcbees.chosen.client.event.ChosenChangeEvent.ChosenChangeHandler;
+import com.arcbees.chosen.client.event.ChosenCreateEvent;
+import com.arcbees.chosen.client.event.ChosenCreateEvent.ChosenCreateHandler;
 import com.arcbees.chosen.client.event.HasAllChosenHandlers;
 import com.arcbees.chosen.client.event.HidingDropDownEvent;
 import com.arcbees.chosen.client.event.HidingDropDownEvent.HidingDropDownHandler;
@@ -160,6 +162,12 @@ public class  ChosenListBox extends ListBox implements HasAllChosenHandlers {
     public HandlerRegistration addChosenChangeHandler(
             ChosenChangeHandler handler) {
         return ensureChosenHandlers().addHandler(ChosenChangeEvent.getType(),
+                handler);
+    }
+    
+    public HandlerRegistration addChosenCreateHandler(
+            ChosenCreateHandler handler) {
+        return ensureChosenHandlers().addHandler(ChosenCreateEvent.getType(),
                 handler);
     }
 
@@ -378,6 +386,10 @@ public class  ChosenListBox extends ListBox implements HasAllChosenHandlers {
     public String getPlaceholderTextSingle() {
         return options.getPlaceholderTextSingle();
     }
+    
+    public String getNoResultsCreateText() {
+        return options.getNoResultsCreateText();
+    }
 
     /**
      * Return the value of the first selected option if any. Returns false otherwise.
@@ -595,6 +607,10 @@ public class  ChosenListBox extends ListBox implements HasAllChosenHandlers {
     public boolean isSingleBackstrokeDelete() {
         return options.isSingleBackstrokeDelete();
     }
+    
+    public boolean isNoResultsCreate() {
+        return options.isNoResultsCreate();
+    }
 
     public void removeGroup(int index){
         $(OPTGROUP_TAG, getElement()).eq(index).remove();
@@ -644,6 +660,14 @@ public class  ChosenListBox extends ListBox implements HasAllChosenHandlers {
 
     public void setNoResultsText(String noResultsText) {
         options.setNoResultsText(noResultsText);
+    }
+    
+    public void setNoResultsCreateText(String noResultsCreateText) {
+        options.setNoResultsCreateText(noResultsCreateText);
+    }
+    
+    public void setNoResultsCreate(boolean noResultsCreate) {
+        options.setNoResultsCreate(noResultsCreate);
     }
 
     public void setPlaceholderText(String placeholderText) {

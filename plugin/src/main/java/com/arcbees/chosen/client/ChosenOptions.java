@@ -31,6 +31,8 @@ public class ChosenOptions {
     private boolean singleBackstrokeDelete;
     private boolean highlightSearchTerm;
     private ResultsFilter resultFilter;
+    private boolean noResultsCreate;
+    private String noResultsCreateText;
 
     public ChosenOptions() {
         setDefault();
@@ -46,6 +48,10 @@ public class ChosenOptions {
 
     public String getNoResultsText() {
         return noResultsText;
+    }
+    
+    public String getNoResultsCreateText() {
+        return noResultsCreateText;
     }
 
     public String getPlaceholderText() {
@@ -89,6 +95,10 @@ public class ChosenOptions {
     
     public boolean isHighlightSearchTerm() {
         return highlightSearchTerm;
+    }
+    
+    public boolean isNoResultsCreate() {
+        return noResultsCreate;
     }
 
     public ChosenOptions setAllowSingleDeselect(Boolean allowSingleDeselect) {
@@ -155,6 +165,14 @@ public class ChosenOptions {
     public void setHighlightSearchTerm(boolean highlightSearchTerm) {
         this.highlightSearchTerm = highlightSearchTerm;
     }
+    
+    public void setNoResultsCreate(boolean noResultsCreate) {
+        this.noResultsCreate = noResultsCreate;
+    }
+
+    public void setNoResultsCreateText(String noResultsCreateText) {
+        this.noResultsCreateText = noResultsCreateText;
+    }
 
     private void setDefault() {
         allowSingleDeselect = false;
@@ -163,6 +181,6 @@ public class ChosenOptions {
         singleBackstrokeDelete = false;
         maxSelectedOptions = -1;
         highlightSearchTerm = true;
-
+        noResultsCreate = false;
     }
 }
